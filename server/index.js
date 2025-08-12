@@ -25,7 +25,7 @@ const room = new Map();
 
 app.get("/api/room", (req, res) => {
   const roomId = Math.random().toString(36).slice(2, 11);
-  // user name require from database after signUp then SignIn then token verification 
+  // user name require from database after signUp ==> SignIn ==> token verification ==> name 
   room.set(roomId, {admin:{name:"",socketId:""},people:[]});
   res.json({ roomId });
 });
