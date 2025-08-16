@@ -72,3 +72,5 @@ return arrey;
 
 
 }
+
+export default Rect

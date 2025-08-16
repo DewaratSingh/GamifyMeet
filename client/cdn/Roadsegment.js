@@ -28,3 +28,4 @@ ctx.stroke()
 
 
 }
+export default RoadSegment

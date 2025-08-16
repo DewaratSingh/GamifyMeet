@@ -74,7 +74,7 @@ point(offSet){
 
 
 
-
+export default Polygon
 
 
 

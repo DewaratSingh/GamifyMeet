@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 import Circle from "../../cdn/circle";
 import ImgObj from "../../cdn/imgObj";
 import { io } from "socket.io-client";
+import { obj } from "../../cdn/map";
 
 const socket = io("http://localhost:3000", {
   autoConnect: true,
@@ -38,17 +39,31 @@ const Main = () => {
     const player = new Circle(canvas.width / 2, canvas.height / 2, 20, "red");
     const img = new ImgObj(50, 50, "/OIP.jpeg", 100, 100);
 
-    const keys = { w: false, a: false, s: false, d: false };
+    const keys = {
+      w: false,
+      a: false,
+      s: false,
+      d: false,
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+    };
 
     const handleKeyDown = (e) => {
-      if (keys.hasOwnProperty(e.key)) keys[e.key] = true;
-      else if (keys.hasOwnProperty(e.key.toLowerCase()))
+      if (keys.hasOwnProperty(e.key)) {
+        keys[e.key] = true;
+      } else if (keys.hasOwnProperty(e.key.toLowerCase())) {
         keys[e.key.toLowerCase()] = true;
+      }
     };
+
     const handleKeyUp = (e) => {
-      if (keys.hasOwnProperty(e.key)) keys[e.key] = false;
-      else if (keys.hasOwnProperty(e.key.toLowerCase()))
+      if (keys.hasOwnProperty(e.key)) {
+        keys[e.key] = false;
+      } else if (keys.hasOwnProperty(e.key.toLowerCase())) {
         keys[e.key.toLowerCase()] = false;
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -93,29 +108,36 @@ const Main = () => {
     });
 
     socket.on("player:leave", ({ id }) => {
-      alert("")
+      alert("");
       otherPlayers.current.delete(id);
     });
 
     function animation() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (keys.w) player.initialPo.Y -= speed;
-      if (keys.s) player.initialPo.Y += speed;
-      if (keys.a) player.initialPo.X -= speed;
-      if (keys.d) player.initialPo.X += speed;
+      if (keys.w || keys.ArrowUp) player.initialPo.Y -= speed;
+      if (keys.s || keys.ArrowDown) player.initialPo.Y += speed;
+      if (keys.a || keys.ArrowLeft) player.initialPo.X -= speed;
+      if (keys.d || keys.ArrowRight) player.initialPo.X += speed;
 
       camera.x = player.initialPo.X - canvas.width / 2;
       camera.y = player.initialPo.Y - canvas.height / 2;
 
+      //--------------------------------drawing object-------------------------------------------------------------------------------------------------
       img.draw(ctx, camera, false);
+      obj.forEach((obj) => {
+        obj.draw(ctx, camera, false);
+      });
 
+      //--------------------------------drawing other player-------------------------------------------------------------------------------------------------
       for (const op of otherPlayers.current.values()) {
         op.draw(ctx, camera, false);
       }
 
+      //--------------------------------drawing player-------------------------------------------------------------------------------------------------
       player.draw(ctx, camera, false);
 
+      //----------------------------------------------------------------------------------------------------------------------------------------------------------------
       if (
         player.initialPo.X !== lastSent.x ||
         player.initialPo.Y !== lastSent.y
